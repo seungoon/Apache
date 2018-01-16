@@ -1,0 +1,21 @@
+apacheのMultiViews機能を有効化する方法：
+※httpd.confを編集する(下記の内容を追加)。
+
+    Alias /comimg/ "/compradores/ws/images/"
+
+    <Directory "/compradores/ws/images/">
+        Options Indexes Multiviews
+        AllowOverride None
+        Order allow,deny
+        Allow from all
+    </Directory>
+ 
+  
+  
+ ⇒参考サイト：http://httpd.apache.org/docs/current/content-negotiation.html
+ 
+ ※サンプル：
+ 　# Cache Control: 60 minutes for static content
+　<FilesMatch "\.(html|css|js|jpe?g|gif|png)$">
+ 　Header set Cache-Control "max-age=3600, public"
+  </FilesMatch>
