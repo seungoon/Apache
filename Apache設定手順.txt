@@ -1,0 +1,104 @@
+★Apache設定手順(Windows向け)：
+１．Apacheをダウンロードする。
+　ダウンロードさいと：　https://www.apachelounge.com/download/
+　※OS環境により32bit、64bitを選んでください。
+
+２．設定ファイルの修正
+　設定ファイルは「(インストールしたディレクトリ)\Apache24\conf\」ディレクトリに入っている「http.conf」ファイルです。
+　
+　ファイルの修正を行う前にコピーしたものをバックアップとして保存しておきます。
+　・httpd.conf_BK20180125
+　
+　「http.conf」ファイル内で「ServerRoot」を検索して下さい。次のような記載が見つかります。
+　・ServerRoot "c:/Apache24"
+　これを自分の環境にインストールしたディレクトリに合わせて変更します。面倒だったらこのままでも結構です。
+　
+　同じように設定ファイル内に３か所インストールしたディレクトリに関する記述があるので同じように変更して下さい。
+　
+　次にポート番号の設定を確認します。ファイル内で「Listen」を検索して下さい。
+　・Listen 80
+　使用するポート番号はデフォルトで80番となっています。通常はこれで問題ありませんが、既に他のアプリケーションで
+　使用していると分かっている場合には必ず変更して下さい。
+　・Listen 8080
+　※80番以外のポート番号を使う場合は、Webサーバにアクセスする時にポート番号を付与してアクセスしなければいけないこと。
+　
+　最後に「ServerName」の設定です。ファイル内で「ServerName」を検索して下さい。
+　・#ServerName www.example.com:80
+　※先頭が"#"の行はコメントとして扱われており、無効の意味です。
+　自分の環境に合わせて変更しても結構です。
+　・ServerName www.test.com:8080
+　※「：」以降の数字はポート番号に合わせて設定してください。
+
+３．Apacheをサービスとして設定・起動
+　コマンドプロンプトを管理者として起動し、「httpd.exe」があるディレクトリまで移動してから「httpd -k install」と実行して下さい。
+　その後、管理ツールの「サービス」の画面を確認してみると「Apache2.4」というサービスが追加されていることが確認できます。
+　
+　「Apache2.4」サービスをクリックし、「開始(S)」ボタンを押下します。これでApacheサービスが起動されます。
+
+４．連絡先メールアドレス(ServerAdmin)の設定
+　Apacheがエラー表示を行う場合などに、問い合わせ先となる連絡先メールアドレスです。
+　
+　「httpd.conf」ファイルで「ServerAdmin」で検索してみてください。
+　※担当者のメールアドレスを記入してください。
+
+５．ホスト名によるアクセス設定(hostsファイル)の設定
+　「hosts」ファイルの設置場所：C:\Windows\System32\drivers\etc
+　・127.0.0.1       localhost
+
+６．初期画面の設定
+　クライアントからのリクエストがあった時、ファイル名を指定せずにディレクトリだけ指定される時があります。
+　そのようなファイル名が省略された場合にどのファイルを返すのかを「DirectoryIndex」で指定します。
+　
+　「httpd.conf」ファイルで「DirectoryIndex」で検索してみてください。
+　・DirectoryIndex index.html
+　※複数ファイルを定義する場合、複数の拡張子ファイルを追加する。
+　・DirectoryIndex index.html index.htm index.php
+
+７．画面の置き場所の設定
+　ApacheはWWWサーバですのでクライアントからコンテンツのリクエストに対して対応するコンテンツを返します。
+　それらのコンテンツを配置しておく場所を「DocumentRoot」で指定します。
+　
+　「httpd.conf」ファイルで「DocumentRoot」で検索してみてください。
+　・DocumentRoot "c:/Apache24/htdocs"
+
+８．mod_rewriteでメンテナンスモードの設定
+　「httpd.conf」ファイルで「rewrite_module」で検索してみてください。
+　・LoadModule rewrite_module modules/mod_rewrite.so
+　※"#"を外し、有効にしてください。
+　
+　以下の内容を「httpd.conf」ファイルに追加する。
+　# メンテナンス画面のURL
+　ErrorDocument 503 /maintenance.html
+
+　<IfModule mod_rewrite.c>
+　  
+　  RewriteEngine On
+　  
+　  # 2011年05月27日 20:00 以降をメンテナンスモードにする
+　  RewriteCond %{TIME} >201701261025.*
+　  # メンテナンス画面と画像,js,cssをリダイレクトから除外
+　  RewriteCond %{REQUEST_FILENAME} !(/maintenance.html|\.(gif|jpe?g|png|js|css))$
+　  # 指定IPを除外
+　  RewriteCond %{REMOTE_ADDR} !=192.168.0.4
+　  RewriteCond %{REMOTE_ADDR} !=192.168.0.5
+　  # 503エラーで返す。
+　  RewriteRule ^.*$ - [R=503,L]
+　</IfModule>
+
+　<IfModule mod_headers.c>
+　  # クローラー用に指定時間後にまたきてねと言っておく
+　  Header set Retry-After "Fri, 27 May 2017 11:00:00 GMT"
+　</IfModule>
+
+９．リバースプロキシの設定
+　リバースプロキシとは、ある特定のWebサーバーの代わりにクライアント（ユーザー）からの
+　アクセスを受け付ける代行（プロキシ）サーバーのひとつで、Webサイトを運営する側のネットワークに
+　設置されるもののことである。
+
+
+
+
+
+
+
+
