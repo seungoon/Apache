@@ -1,0 +1,10 @@
+※[Apacheインストールフォルダ]/conf/httpd.confを開き、最後の方に次の文を追記します。
+
+<IfModule mpm_winnt>
+    ThreadsPerChild        150
+    MaxConnectionsPerChild   0
+    Win32DisableAcceptEx
+</IfModule>
+
+以下の場合に、設定が必要と思う。
+１．CPU負荷が高い処理を行うとき。
