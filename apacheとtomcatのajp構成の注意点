@@ -1,0 +1,11 @@
+■apacheとtomcat構成でセッションエラー
+・mod_proxy_ajpを使用した時。
+・対応策はapacheとtomcatのセッション保持すること。
+
+mod_proxy_ajpの設定が指定してある
+conf.d以下のproxy.confへkeepalive=onを追加
+----------------------------------------------------------------------------
+<Location /アプリケーション名/>
+  ProxyPass ajp://localhost:ポート番号/アプリケーション名/ keepalive=on
+</Location>
+
